@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Geo → Assetto Corsa</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#0b1220;color:#e8edf5}
+header{padding:16px 20px;background:#121c2d;border-bottom:1px solid #31415a}h1{font-size:20px;margin:0 0 4px}header p,small{color:#a8b6ca}
+main{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 68px)}aside{padding:18px;background:#0f1929;border-right:1px solid #31415a}#map{height:calc(100vh - 68px);min-height:500px}
+button{border:0;border-radius:8px;padding:10px 12px;background:#4f8cff;color:white;font-weight:650;cursor:pointer}button:disabled{opacity:.45}.secondary{background:#293a54}.row{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.status{white-space:pre-wrap;background:#172337;border:1px solid #344660;padding:11px;border-radius:8px;font-size:12px;line-height:1.5;margin-top:14px}small{display:block;line-height:1.5;margin-top:10px}
+@media(max-width:800px){main{grid-template-columns:1fr}#map{height:55vh;min-height:350px}aside{border:0;border-bottom:1px solid #31415a}}
+</style></head><body>
+<header><h1>Geo → Assetto Corsa</h1><p>Prototype indépendant · extraction géographique · confiance des bâtiments</p></header>
+<main><aside><strong>1. Dessine un rectangle</strong><small>Utilise l'outil rectangle en haut à gauche. Tu peux le redimensionner avant l'extraction.</small>
+<div class="row"><button id="extract" disabled>Extraire la zone</button><button id="clear" class="secondary">Effacer</button></div>
+<div class="row"><button id="geo" class="secondary" disabled>Télécharger GeoJSON</button><button id="manifest" class="secondary" disabled>Manifeste</button></div>
+<div id="status" class="status">Connexion au serveur…</div>
+<small>Les estimations restent identifiées comme telles. Les images satellite ne sont pas récupérées automatiquement : il faut une licence autorisant leur intégration au mod.</small><small>Attribution : © OpenStreetMap contributors · ODbL.</small></aside><div id="map"></div></main>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script>
+const status=document.getElementById('status'),extract=document.getElementById('extract');let rect=null,result=null;
+const map=L.map('map').setView([45.15,5.78],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
+const group=new L.FeatureGroup().addTo(map);
+map.addControl(new L.Control.Draw({draw:{polyline:false,polygon:false,circle:false,marker:false,circlemarker:false,rectangle:{shapeOptions:{color:'#4f8cff'}}},edit:{featureGroup:group}}));
+map.on(L.Draw.Event.CREATED,e=>{group.clearLayers();group.addLayer(e.layer);rect=e.layer;extract.disabled=false;result=null;status.textContent='Rectangle prêt. Lance l’extraction.'});
+map.on(L.Draw.Event.EDITED,()=>{rect=group.getLayers()[0]||null;result=null});
+map.on(L.Draw.Event.DELETED,()=>{rect=null;extract.disabled=true;result=null});
+document.getElementById('clear').onclick=()=>{group.clearLayers();rect=null;result=null;extract.disabled=true;document.getElementById('geo').disabled=true;document.getElementById('manifest').disabled=true;status.textContent='Rectangle effacé.'};
+async function init(){try{let r=await fetch('/api/health'),d=await r.json();status.textContent='Serveur prêt · limite '+d.max_area_km2+' km². Dessine une zone.'}catch{status.textContent='Serveur inaccessible. Consulte README.md pour démarrer l’API.'}}init();
+function save(name,data,type){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type}));a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+extract.onclick=async()=>{if(!rect)return;let b=rect.getBounds();extract.disabled=true;status.textContent='Extraction en cours…';try{let r=await fetch('/api/extract',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({south:b.getSouth(),west:b.getWest(),north:b.getNorth(),east:b.getEast()})}),d=await r.json();if(!r.ok)throw Error(d.detail||'Erreur');result=d;document.getElementById('geo').disabled=false;document.getElementById('manifest').disabled=false;let c=d.manifest.counts,q=d.manifest.building_quality_counts;status.textContent=`Extraction terminée\nSurface : ${d.manifest.area_km2} km²\nRoutes : ${c.routes}\nBâtiments : ${c.batiments}\nPoints : ${c.points}\n\nQualité bâtiments\nDétaillés : ${q.detailed}\nAttributs partiels : ${q.partial}\nÀ estimer : ${q.estimated}\n\nConfiance heuristique, sans validation sur le terrain.`}catch(e){status.textContent='Échec : '+e.message+'\nEssaie une zone plus petite ou réessaie plus tard.'}finally{extract.disabled=false}};
+document.getElementById('geo').onclick=()=>result&&save('export.geojson',result.geojson,'application/geo+json');
+document.getElementById('manifest').onclick=()=>result&&save('manifest.json',result.manifest,'application/json');
+</script></body></html>
