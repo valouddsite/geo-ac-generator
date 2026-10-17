@@ -62,6 +62,8 @@ def building_quality(tags: dict[str, Any]) -> dict[str, Any]:
         ] if not present]
     }
 
+DRIVING_HIGHWAYS = {"motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", "secondary", "secondary_link", "tertiary", "tertiary_link", "unclassified", "residential", "living_street", "service", "road"}
+
 def osm_to_geojson(osm: dict[str, Any]) -> dict[str, Any]:
     features = []
     for e in osm.get("elements", []):
@@ -91,7 +93,7 @@ def osm_to_geojson(osm: dict[str, Any]) -> dict[str, Any]:
 async def fetch_osm(b: Bounds) -> dict[str, Any]:
     query = f"""[out:json][timeout:45];
 (
- way["highway"]({b.south},{b.west},{b.north},{b.east});
+ way["highway"~"^(motorway|motorway_link|trunk|trunk_link|primary|primary_link|secondary|secondary_link|tertiary|tertiary_link|unclassified|residential|living_street|service|road)$"]({b.south},{b.west},{b.north},{b.east});
  way["building"]({b.south},{b.west},{b.north},{b.east});
  node["amenity"]({b.south},{b.west},{b.north},{b.east});
  node["shop"]({b.south},{b.west},{b.north},{b.east});
