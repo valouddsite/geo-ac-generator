@@ -7,7 +7,22 @@
 <header><div><h1>Geo → aperçu 3D</h1><p>Traitement local dans le navigateur · le fichier n'est pas envoyé à un serveur</p></div><div style="margin-left:auto"><a href="./index.html">← Retour à l'extracteur</a></div></header>
 <div id="bar"><input id="file" type="file" accept=".json,.geojson,application/json,application/geo+json"><button id="sample" class="secondary">Charger l’exemple</button><button id="reset" class="secondary">Réinitialiser la vue</button><button id="obj">Exporter aperçu OBJ</button><span id="status">Charge un export GeoJSON pour afficher les routes et bâtiments en 3D.</span></div>
 <div id="view"></div><footer>Les hauteurs dérivées sont approximatives. Le modèle n'inclut pas le relief réel, les façades photographiques, les collisions ni le format KN5 d'Assetto Corsa.</footer>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<script>
+window.addEventListener('error', event => {
+  const status = document.getElementById('status');
+  if (status && event.message) status.textContent = 'Erreur JavaScript : ' + event.message;
+});
+window.addEventListener('unhandledrejection', event => {
+  const status = document.getElementById('status');
+  if (status) status.textContent = 'Erreur de chargement 3D : ' + (event.reason?.message || String(event.reason));
+});
+</script>
 <script type="module">
+const statusAtStart=document.getElementById('status');
+statusAtStart.textContent='Chargement du moteur 3D…';
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
 const host=document.getElementById('view'),status=document.getElementById('status');
