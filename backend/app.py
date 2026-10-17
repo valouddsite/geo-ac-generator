@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
-MAX_AREA_KM2 = float(os.getenv("MAX_AREA_KM2", "25"))
+MAX_AREA_KM2 = float(os.getenv("MAX_AREA_KM2", "50"))
 OVERPASS_URL = os.getenv("OVERPASS_URL", "https://overpass-api.de/api/interpreter")
 app = FastAPI(title="Geo → Assetto Corsa Generator", version="0.1.0")
 app.mount("/static", StaticFiles(directory=os.path.join(ROOT, "frontend")), name="static")
