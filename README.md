@@ -22,7 +22,8 @@ GitHub peut demander quelques minutes pour la première publication. Cette confi
 - Métadonnées de provenance et indicateurs heuristiques pour les bâtiments.
 - Export GeoJSON et manifeste JSON.
 - Aperçu 3D dans le navigateur depuis un fichier GeoJSON.
-- Export OBJ simplifié de l'aperçu 3D (format intermédiaire, pas un fichier Assetto Corsa).
+- Chargement facultatif d’un relief depuis l’API d’altitude Open-Meteo, fondée sur Copernicus DEM GLO-90 (~90 m); le terrain et les routes/bâtiments sont positionnés selon les altitudes interpolées.
+- Export OBJ simplifié de l’aperçu 3D (format intermédiaire, pas un fichier Assetto Corsa).
 
 ## Utiliser l'aperçu 3D
 Ouvre le lien « Ouvrir l'aperçu 3D » depuis la carte, puis charge `export.geojson`. Le bouton « Charger l'exemple » permet de tester la vue sans extraction. Le rendu utilise Three.js depuis un CDN et nécessite une connexion Internet. La géométrie importée est traitée dans l'onglet du navigateur; le fichier GeoJSON n'est pas envoyé à un serveur tiers par le visualiseur.
@@ -44,7 +45,8 @@ Puis ouvre http://127.0.0.1:8000. L'API locale offre une autre voie pour interro
 - Les services publics Overpass peuvent être lents, indisponibles ou limiter les requêtes. Réduis la zone et réessaie si nécessaire.
 - La limite côté navigateur est de 25 km² par extraction.
 - Les hauteurs estimées sont des heuristiques, pas des mesures; les façades et toitures ne sont pas reconstruites fidèlement.
-- L'aperçu OBJ est une géométrie de départ : il ne contient pas de MNT/DEM réel, de textures de façades, de collisions optimisées ni de matériaux finalisés.
+- Le relief utilise Copernicus DEM GLO-90 via Open-Meteo (résolution d’environ 90 m) : il montre les pentes générales, mais ne garantit pas la précision d’une chaussée de course. L’altitude dépend d’un service externe. Attribuer Open-Meteo et Copernicus si les données de relief sont redistribuées.
+- L’aperçu OBJ est une géométrie de départ : il ne contient pas de textures de façades, de collisions optimisées ni de matériaux finalisés.
 - Le projet ne produit pas encore de KN5 ni de piste Assetto Corsa prête à jouer.
 - Aucune imagerie satellite n'est téléchargée. Utiliser uniquement des modèles, orthophotos et textures dont les licences autorisent explicitement la transformation et la redistribution dans un mod.
 
