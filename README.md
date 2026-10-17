@@ -22,7 +22,7 @@ GitHub peut demander quelques minutes pour la première publication. Cette confi
 - Métadonnées de provenance et indicateurs heuristiques pour les bâtiments.
 - Export GeoJSON et manifeste JSON.
 - Aperçu 3D dans le navigateur depuis un fichier GeoJSON.
-- Chargement facultatif d’un relief depuis l’API d’altitude Open-Meteo, fondée sur Copernicus DEM GLO-90 (~90 m); le terrain et les routes/bâtiments sont positionnés selon les altitudes interpolées.
+- Chargement facultatif d’un relief depuis l’API d’altitude Open-Meteo, fondée sur Copernicus DEM GLO-90 (~90 m); aperçu sur une grille de 10 × 10 points (une seule requête) pour limiter les erreurs de disponibilité. Le terrain et les routes/bâtiments sont positionnés selon les altitudes interpolées.
 - Export OBJ simplifié de l’aperçu 3D (format intermédiaire, pas un fichier Assetto Corsa).
 
 ## Utiliser l'aperçu 3D
